@@ -370,7 +370,7 @@ export async function ensurePr(
         prCurrentLabels,
         configuredLabels,
       );
-      let topics: string[];
+      let topics: string[] = [];
 
       if (prBody.comments) {
         topics = prBody.comments.map((x) => x.title);
