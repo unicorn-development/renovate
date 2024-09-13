@@ -33,7 +33,6 @@ import type {
   UpdatePrConfig,
 } from '../types';
 import { repoFingerprint } from '../util';
-import { smartTruncate } from '../utils/pr-body';
 import { readOnlyIssueBody } from '../utils/read-only-issue-body';
 import * as comments from './comments';
 import { BitbucketPrCache } from './pr-cache';
@@ -589,7 +588,7 @@ async function closeIssue(issueNumber: number): Promise<void> {
 
 export function massageMarkdown(input: string): string {
   // Remove any HTML we use
-  return smartTruncate(input, maxBodyLength())
+  return input
     .replace(
       'you tick the rebase/retry checkbox',
       'by renaming this PR to start with "rebase!"',

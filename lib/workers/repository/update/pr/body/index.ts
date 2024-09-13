@@ -1,6 +1,7 @@
 import type { RenovateConfig } from '../../../../../config/types';
 import type { PrDebugData } from '../../../../../modules/platform';
 import { platform } from '../../../../../modules/platform';
+import { smartTruncate } from '../../../../../modules/platform/utils/pr-body';
 import { detectPlatform } from '../../../../../util/common';
 import { regEx } from '../../../../../util/regex';
 import { toBase64 } from '../../../../../util/string';
@@ -151,6 +152,7 @@ export function getPrBody(
 
     result.body = createPrBody(content, branchConfig, prBodyConfig);
   }
+  result.body = smartTruncate(result.body, platform.maxBodyLength());
   return result;
 }
 
