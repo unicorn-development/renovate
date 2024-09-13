@@ -84,6 +84,17 @@ interface PrBodyConfig {
   appendExtra?: string | null | undefined;
   rebasingNotice?: string;
   debugData: PrDebugData;
+  bodyMaxLength: number;
+}
+
+interface PrBodyContent {
+  body: string;
+  comments?: PrComment[];
+}
+
+interface PrComment {
+  title: string;
+  content: string;
 }
 
 const rebasingRegex = regEx(/\*\*Rebasing\*\*: .*/);
@@ -92,7 +103,7 @@ export function getPrBody(
   branchConfig: BranchConfig,
   prBodyConfig: PrBodyConfig,
   config: RenovateConfig,
-): string {
+): PrBodyContent {
   massageUpdateMetadata(branchConfig);
   let warnings = '';
   warnings += getWarnings(branchConfig);
@@ -103,7 +114,7 @@ export function getPrBody(
       branchConfig.dependencyDashboard,
     );
   }
-  const content = {
+  let content = {
     header: getPrHeader(branchConfig),
     table: getPrUpdatesTable(branchConfig),
     warnings,
@@ -114,6 +125,48 @@ export function getPrBody(
     footer: getPrFooter(branchConfig),
   };
 
+  let prBody = createPrBody(content, branchConfig, prBodyConfig);
+
+  if (prBody.length <= prBodyConfig.bodyMaxLength) {
+    return { body: prBody };
+  }
+
+  const changelogs = content.changelogs;
+  content = {
+    ...content,
+    changelogs: 'Please see comment below for changelogs',
+  };
+
+  prBody = createPrBody(content, branchConfig, prBodyConfig);
+
+  if (prBody.length <= prBodyConfig.bodyMaxLength) {
+    return {
+      body: prBody,
+      comments: [{ title: 'Release Notes', content: changelogs }],
+    };
+  }
+
+  const table = content.table;
+  content = {
+    ...content,
+    table: 'Please see comment below for updates',
+  };
+  prBody = createPrBody(content, branchConfig, prBodyConfig);
+
+  return {
+    body: prBody,
+    comments: [
+      { title: 'Release Notes', content: changelogs },
+      { title: 'Updates', content: table },
+    ],
+  };
+}
+
+function createPrBody(
+  content: Record<string, unknown>,
+  branchConfig: BranchConfig,
+  prBodyConfig: PrBodyConfig,
+): string {
   let prBody = '';
   if (branchConfig.prBodyTemplate) {
     const prBodyTemplate = branchConfig.prBodyTemplate;
