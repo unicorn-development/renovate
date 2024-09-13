@@ -3452,6 +3452,16 @@ These updates have all been created already. Click a checkbox below to force a r
     });
   });
 
+  describe('maxBodyLength()', () => {
+    it('maxBodyLength is 25000 if too low API version', async () => {
+      expect(gitlab.maxBodyLength()).toBe(25000);
+    });
+
+    it('maxBodyLength is 1000000 description for API version gt 13.4', async () => {
+      expect(gitlab.maxBodyLength()).toBe(1000000);
+    });
+  });
+
   describe('deleteLabel(issueNo, label)', () => {
     it('should delete the label', async () => {
       httpMock
