@@ -370,7 +370,28 @@ export async function ensurePr(
         prCurrentLabels,
         configuredLabels,
       );
+      let topics: string[];
 
+      if (prBody.comments) {
+        topics = prBody.comments.map((x) => x.title);
+        for (const comment of prBody.comments) {
+          await platform.ensureComment({
+            number: existingPr.number,
+            topic: comment.title,
+            content: comment.content,
+          });
+        }
+      }
+      const topicsToDelete = ['Release Notes', 'Updates'].filter(
+        (x) => !topics.includes(x),
+      );
+      for (const topic of topicsToDelete) {
+        await platform.ensureCommentRemoval({
+          number: existingPr.number,
+          type: 'by-topic',
+          topic,
+        });
+      }
       if (
         existingPr?.targetBranch === config.baseBranch &&
         existingPrTitle === newPrTitle &&
@@ -497,6 +518,15 @@ export async function ensurePr(
           draftPR: !!config.draftPR,
           milestone: config.milestone,
         });
+        if (pr && prBody.comments) {
+          for (const comment of prBody.comments) {
+            await platform.ensureComment({
+              number: pr.number,
+              topic: comment.title,
+              content: comment.content,
+            });
+          }
+        }
 
         incCountValue('ConcurrentPRs');
         incCountValue('HourlyPRs');
