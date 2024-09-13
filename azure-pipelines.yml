@@ -4,27 +4,27 @@
 # https://aka.ms/yaml
 
 trigger:
-- main
+  - main
 
 pool:
   vmImage: ubuntu-latest
 
 steps:
-- task: NodeTool@0
-  inputs:
-    versionSource: 'spec'
-    versionSpec: '20.x'
-- script: corepack enable
-  displayName: 'enable corepack'
-- script: pnpm install
-  displayName: 'pnpm install'
-- script: pnpm build
-  displayName: 'pnpm build'
-- script: |
-    pnpm start --host-rules='[{"matchHost": "pkgs.dev.azure.com", "hostType": "nuget", "password": "$(System.AccessToken)"}]'
-  displayName: 'pnpm start'
-  env:
-    RENOVATE_TOKEN: $(System.AccessToken)
-    GITHUB_COM_TOKEN: $(GithubToken)
-- script: pnpm test
-  displayName: 'pnpm test'
+  - task: NodeTool@0
+    inputs:
+      versionSource: 'spec'
+      versionSpec: '20.x'
+  - script: corepack enable
+    displayName: 'enable corepack'
+  - script: pnpm install
+    displayName: 'pnpm install'
+  - script: pnpm build
+    displayName: 'pnpm build'
+  - script: |
+      pnpm start --host-rules='[{"matchHost": "pkgs.dev.azure.com", "hostType": "nuget", "password": "$(System.AccessToken)"}]'
+    displayName: 'pnpm start'
+    env:
+      RENOVATE_TOKEN: $(System.AccessToken)
+      GITHUB_COM_TOKEN: $(GithubToken)
+  - script: pnpm test
+    displayName: 'pnpm test'
