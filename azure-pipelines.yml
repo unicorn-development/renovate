@@ -26,3 +26,5 @@ steps:
   env:
     RENOVATE_TOKEN: $(System.AccessToken)
     GITHUB_COM_TOKEN: $(GithubToken)
+- script: pnpm test
+  displayName: 'pnpm test'
