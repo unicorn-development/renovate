@@ -15,6 +15,10 @@ steps:
     versionSource: 'spec'
     versionSpec: '20.x'
 - script: corepack enable
+  displayName: 'enable corepack'
 - script: pnpm install
+  displayName: 'pnpm install'
 - script: pnpm build
+  displayName: 'pnpm build'
 - script: pnpm start
+  displayName: 'pnpm start'
