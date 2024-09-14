@@ -1,9 +1,8 @@
 schedules:
-  - cron: "0 1 * * *"
-    displayName: "Every Day at 2am"
+  - cron: '0 1 * * *'
+    displayName: 'Every Day at 2am'
     branches:
       include: [main]
-
 
 trigger:
   - main
