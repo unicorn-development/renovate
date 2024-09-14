@@ -93,7 +93,7 @@ interface PrBodyContent {
 }
 
 interface PrComment {
-  title: string;
+  title: 'Release Notes' | 'Updates';
   content: string;
 }
 
