@@ -2162,4 +2162,10 @@ describe('modules/platform/bitbucket/index', () => {
       await expect(bitbucket.getJsonFile('file.json')).rejects.toThrow();
     });
   });
+
+  describe('maxBodyLength()', () => {
+    it('returns 50000', () => {
+      expect(bitbucket.maxBodyLength()).toBe(50000);
+    });
+  });
 });

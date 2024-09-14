@@ -1323,4 +1323,10 @@ describe('modules/platform/codecommit/index', () => {
       );
     });
   });
+
+  describe('maxBodyLength()', () => {
+    it('returns Infinity', () => {
+      expect(codeCommit.maxBodyLength()).toBe(Infinity);
+    });
+  });
 });
