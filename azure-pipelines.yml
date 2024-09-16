@@ -10,6 +10,9 @@ trigger:
 pool:
   vmImage: ubuntu-latest
 
+variables:
+  - group: 'renovate'
+
 steps:
   - task: NodeTool@0
     inputs:
