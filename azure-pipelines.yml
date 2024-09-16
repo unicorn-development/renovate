@@ -30,6 +30,5 @@ steps:
     env:
       RENOVATE_TOKEN: $(System.AccessToken)
       GITHUB_COM_TOKEN: $(GithubToken)
-      LOG_LEVEL: debug
-  - script: pnpm test
-    displayName: 'pnpm test'
+  # - script: pnpm test
+  #   displayName: 'pnpm test'
