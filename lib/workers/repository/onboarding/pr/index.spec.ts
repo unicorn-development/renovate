@@ -33,6 +33,7 @@ describe('workers/repository/onboarding/pr/index', () => {
       branches = [];
       platform.massageMarkdown.mockImplementation((input) => input);
       platform.createPr.mockResolvedValueOnce(partial<Pr>());
+      platform.maxBodyLength.mockImplementationOnce(() => Infinity);
       GlobalConfig.reset();
     });
 
