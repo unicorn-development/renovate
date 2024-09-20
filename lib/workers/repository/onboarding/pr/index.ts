@@ -250,7 +250,7 @@ function getPrBody(
       );
     }
     packageFilesContent =
-      '\n### Detected Package Files\n\n' + files.join('\n') + '\n';
+      '### Detected Package Files\n\n' + files.join('\n') + '\n';
   }
 
   let configDesc = '';
@@ -310,7 +310,7 @@ function getPrBody(
       content: content.packageFiles,
     });
     content.packageFiles =
-      'Please see comment below for detected Package Files';
+      'Please see comment below for detected Package Files\n';
 
     result.body = createPrBody(prTemplate, content);
     if (result.body.length <= platform.maxBodyLength()) {
@@ -335,7 +335,7 @@ function createPrBody(template: string, content: PrContent): string {
   if (is.string(config.prFooter)) {
     prBody = `${prBody}\n---\n\n${template.compile(config.prFooter, config)}\n`;
   }
-
+  prBody += content.onboardingConfigHashComment;
   prBody = platform.massageMarkdown(prBody);
   return prBody;
 }
