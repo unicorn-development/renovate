@@ -828,7 +828,9 @@ export function maxBodyLength(): number {
 }
 
 export function maxCommentLength(): number {
-  return 150000;
+  //dirty fix for now 150000 -> 149000 due to missing title calculation
+  //return 150000;
+  return 149000;
 }
 
 /* istanbul ignore next */
