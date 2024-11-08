@@ -9,7 +9,7 @@ module.exports = {
     ":prHourlyLimitNone",
     ":prConcurrentLimitNone",
   ],
-  repositories: ["Development/WorkSimple.Houston", "Development/hshl.IDM", "Development/hshl.myHSHL", "Development/hshl.select", "Development/hshl.sign", "Development/bfw.IDM", "Development/bfw.Portal"],
+  repositories: ["Development/WorkSimple.Houston", "Development/hshl.IDM", "Development/hshl.myHSHL", "Development/hshl.select", "Development/hshl.sign", "Development/bfw.IDM", "Development/bfw.Portal", "Development/Stromodul"],
   packageRules: [
     {
       matchSourceUrls: [
