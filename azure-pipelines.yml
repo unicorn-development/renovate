@@ -18,6 +18,8 @@ steps:
     inputs:
       versionSource: 'spec'
       versionSpec: '20.x'
+  - script: npm install -g corepack
+    displayName: 'update corepack'
   - script: corepack enable
     displayName: 'enable corepack'
   - script: pnpm install
