@@ -277,14 +277,14 @@ function getPrBody(
       getWarnings(config) + getDepWarningsOnboardingPR(packageFiles!, config),
     errors: getErrors(config),
     baseBranch: getBaseBranchDesc(config),
-    prList: getPrList(config, branches),
+    prList: getExpectedPrList(config, branches),
     prHeader,
     prFooter,
     onboardingConfigHashComment,
   };
 
   const result: PrBodyContent = {
-    body: createPrBody(prTemplate, content),
+    body: createPrBody(prTemplate, content, config),
     comments: [],
   };
   if (result.body.length <= platform.maxBodyLength()) {
@@ -298,7 +298,7 @@ function getPrBody(
     });
     content.prList = 'Please see comment below for what to expect';
 
-    result.body = createPrBody(prTemplate, content);
+    result.body = createPrBody(prTemplate, content, config);
     if (result.body.length <= platform.maxBodyLength()) {
       return result;
     }
@@ -312,7 +312,7 @@ function getPrBody(
     content.packageFiles =
       'Please see comment below for detected Package Files\n';
 
-    result.body = createPrBody(prTemplate, content);
+    result.body = createPrBody(prTemplate, content, config);
     if (result.body.length <= platform.maxBodyLength()) {
       return result;
     }
@@ -322,18 +322,25 @@ function getPrBody(
   return result;
 }
 
-function createPrBody(template: string, content: PrContent): string {
-  let prBody = template.replace('{{PACKAGE FILES}}\n', content.packageFiles);
+function createPrBody(
+  bodyTemplate: string,
+  content: PrContent,
+  config: RenovateConfig,
+): string {
+  let prBody = bodyTemplate.replace(
+    '{{PACKAGE FILES}}\n',
+    content.packageFiles,
+  );
   prBody = prBody.replace('{{CONFIG}}\n', content.config);
   prBody = prBody.replace('{{WARNINGS}}\n', content.warnings);
   prBody = prBody.replace('{{ERRORS}}\n', content.errors);
   prBody = prBody.replace('{{BASEBRANCH}}\n', content.baseBranch);
   prBody = prBody.replace('{{PRLIST}}\n', content.prList);
-  if (is.string(config.prHeader)) {
-    prBody = `${template.compile(config.prHeader, config)}\n\n${prBody}`;
+  if (content.prHeader) {
+    prBody = `${template.compile(content.prHeader, config)}\n\n${prBody}`;
   }
-  if (is.string(config.prFooter)) {
-    prBody = `${prBody}\n---\n\n${template.compile(config.prFooter, config)}\n`;
+  if (content.prFooter) {
+    prBody = `${prBody}\n---\n\n${template.compile(content.prFooter, config)}\n`;
   }
   prBody += content.onboardingConfigHashComment;
   prBody = platform.massageMarkdown(prBody);

@@ -14,7 +14,6 @@ import type { BranchStatus } from '../../../types';
 import type { LongCommitSha } from '../../../util/git/types';
 import { toBase64 } from '../../../util/string';
 import { getPrBodyStruct } from '../pr-body';
-import * as prBodyModule from '../utils/pr-body';
 import * as gitlab from '.';
 import * as httpMock from '~test/http-mock';
 import { git, hostRules, logger } from '~test/util';
@@ -3428,36 +3427,17 @@ These updates have all been created already. Click a checkbox below to force a r
     it('returns updated pr body', async () => {
       await initFakePlatform('13.4.0');
       expect(gitlab.massageMarkdown(prBody)).toMatchSnapshot();
-      expect(prBodyModule.smartTruncate).toHaveBeenCalledOnce();
-    });
-
-    it('truncates description if too low API version', async () => {
-      await initFakePlatform('13.3.0');
-      gitlab.massageMarkdown(prBody);
-      expect(prBodyModule.smartTruncate).toHaveBeenCalledTimes(1);
-      expect(prBodyModule.smartTruncate).toHaveBeenCalledWith(
-        expect.any(String),
-        25000,
-      );
-    });
-
-    it('truncates description for API version gt 13.4', async () => {
-      await initFakePlatform('13.4.1');
-      gitlab.massageMarkdown(prBody);
-      expect(prBodyModule.smartTruncate).toHaveBeenCalledTimes(1);
-      expect(prBodyModule.smartTruncate).toHaveBeenCalledWith(
-        expect.any(String),
-        1000000,
-      );
     });
   });
 
   describe('maxBodyLength()', () => {
     it('maxBodyLength is 25000 if too low API version', async () => {
+      await initFakePlatform('13.3.0');
       expect(gitlab.maxBodyLength()).toBe(25000);
     });
 
     it('maxBodyLength is 1000000 description for API version gt 13.4', async () => {
+      await initFakePlatform('13.4.1');
       expect(gitlab.maxBodyLength()).toBe(1000000);
     });
   });

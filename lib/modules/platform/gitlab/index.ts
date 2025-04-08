@@ -55,6 +55,7 @@ import type {
   UpdatePrConfig,
 } from '../types';
 import { repoFingerprint } from '../util';
+import { smartTruncate } from '../utils/pr-body';
 import {
   getMemberUserIDs,
   getMemberUsernames,
