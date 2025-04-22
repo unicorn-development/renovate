@@ -71,7 +71,11 @@ describe('workers/repository/update/pr/index', () => {
 
     beforeEach(() => {
       GlobalConfig.reset();
-      prBody.getPrBody.mockReturnValue({ body, comments: [] });
+      prBody.getPrBody.mockReturnValue({
+        body,
+        comments: [],
+        topicsToDelete: [],
+      });
     });
 
     describe('Create', () => {
@@ -225,9 +229,10 @@ describe('workers/repository/update/pr/index', () => {
         prBody.getPrBody.mockReturnValueOnce({
           body: 'body',
           comments: [
-            { content: 'content', title: 'Release Notes' },
-            { content: 'content', title: 'Updates' },
+            { content: 'content', topic: 'Release Notes' },
+            { content: 'content', topic: 'Updates' },
           ],
+          topicsToDelete: [],
         });
         await ensurePr(config);
         expect(platform.ensureComment).toHaveBeenCalledWith({
@@ -308,6 +313,7 @@ describe('workers/repository/update/pr/index', () => {
             JSON.stringify({ ...prDebugData, labels: ['new_label'] }),
           )}-->\n Some body`,
           comments: [],
+          topicsToDelete: [],
         });
         config.labels = ['new_label'];
         const res = await ensurePr(config);
@@ -506,9 +512,10 @@ describe('workers/repository/update/pr/index', () => {
         prBody.getPrBody.mockReturnValueOnce({
           body: 'body',
           comments: [
-            { content: 'content', title: 'Release Notes' },
-            { content: 'content', title: 'Updates' },
+            { content: 'content', topic: 'Release Notes' },
+            { content: 'content', topic: 'Updates' },
           ],
+          topicsToDelete: [],
         });
         await ensurePr(config);
         expect(platform.ensureComment).toHaveBeenCalledWith({
@@ -530,6 +537,7 @@ describe('workers/repository/update/pr/index', () => {
         prBody.getPrBody.mockReturnValueOnce({
           body: 'body',
           comments: [],
+          topicsToDelete: [],
         });
         await ensurePr(config);
         expect(platform.ensureComment).not.toHaveBeenCalled();

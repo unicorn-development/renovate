@@ -68,7 +68,11 @@ describe('workers/repository/update/pr/body/index', () => {
         },
         {},
       );
-      expect(res).toStrictEqual({ body: '', comments: [] });
+      expect(res).toStrictEqual({
+        body: '',
+        comments: [],
+        topicsToDelete: ['Release Notes', 'Updates'],
+      });
     });
 
     it('massages upgrades', () => {
@@ -334,7 +338,8 @@ describe('workers/repository/update/pr/body/index', () => {
 
       expect(res).toStrictEqual({
         body: '{{{header}}}',
-        comments: [{ content: 'getChangelogs', title: 'Release Notes' }],
+        comments: [{ content: 'getChangelogs', topic: 'Release Notes' }],
+        topicsToDelete: ['Updates'],
       });
     });
 
@@ -368,9 +373,10 @@ describe('workers/repository/update/pr/body/index', () => {
       expect(res).toStrictEqual({
         body: '{{{header}}}',
         comments: [
-          { content: 'getChangelogs', title: 'Release Notes' },
-          { content: 'getPrUpdatesTable', title: 'Updates' },
+          { content: 'getChangelogs', topic: 'Release Notes' },
+          { content: 'getPrUpdatesTable', topic: 'Updates' },
         ],
+        topicsToDelete: [],
       });
     });
   });

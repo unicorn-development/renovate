@@ -4,12 +4,21 @@ import { GlobalConfig } from '../../../../config/global';
 import { logger } from '../../../../logger';
 import type { PackageFile } from '../../../../modules/manager/types';
 import type { Pr } from '../../../../modules/platform';
+import * as _prContent from '../../../../modules/platform/pr-content';
 import * as memCache from '../../../../util/cache/memory';
 import type { BranchConfig } from '../../../types';
 import { OnboardingState } from '../common';
 import { ensureOnboardingPr } from '.';
 import { partial, platform, scm } from '~test/util';
 import type { RenovateConfig } from '~test/util';
+
+vi.mock('../../../../modules/platform/pr-content', async () => {
+  const asdf = await vi.importActual('../../../../modules/platform/pr-content');
+  return {
+    ...asdf,
+  };
+});
+const prContent = vi.mocked(_prContent);
 
 describe('workers/repository/onboarding/pr/index', () => {
   describe('ensureOnboardingPr()', () => {
@@ -114,6 +123,7 @@ describe('workers/repository/onboarding/pr/index', () => {
       'creates PR with empty footer and header' +
         '(onboardingRebaseCheckbox="$onboardingRebaseCheckbox")',
       async ({ onboardingRebaseCheckbox }) => {
+        GlobalConfig.reset();
         config.onboardingRebaseCheckbox = onboardingRebaseCheckbox;
         OnboardingState.prUpdateRequested = true; // case 'false' is tested in "breaks early when onboarding"
         await ensureOnboardingPr(
@@ -251,6 +261,71 @@ describe('workers/repository/onboarding/pr/index', () => {
       config.requireConfig = 'required';
       await ensureOnboardingPr(config, packageFiles, branches);
       expect(platform.createPr).toHaveBeenCalledTimes(1);
+    });
+
+    it('creates PR with comments', async () => {
+      platform.maxBodyLength.mockReset();
+      platform.maxBodyLength.mockImplementation(() => 'prHeader'.length);
+      const getOnboardingPrContent = vi.spyOn(
+        prContent,
+        'getOnboardingPrContent',
+      );
+      getOnboardingPrContent.mockImplementationOnce((_) => {
+        return {
+          body: 'prHeader PackageFiles',
+          comments: [
+            {
+              topic: 'PR List',
+              content: 'PR List',
+            },
+          ],
+          topicsToDelete: ['Package Files'],
+        };
+      });
+
+      await ensureOnboardingPr(
+        {
+          ...config,
+          prHeader: 'prHeader',
+        },
+        packageFiles,
+        branches,
+      );
+      expect(platform.createPr).toHaveBeenCalledTimes(1);
+      expect(platform.ensureComment).toHaveBeenCalledTimes(1);
+    });
+
+    it('updates PR with comments', async () => {
+      platform.maxBodyLength.mockReset();
+      platform.maxBodyLength.mockImplementation(() => 'prHeader'.length);
+      platform.getBranchPr.mockResolvedValue(partial<Pr>({}));
+      const getOnboardingPrContent = vi.spyOn(
+        prContent,
+        'getOnboardingPrContent',
+      );
+      getOnboardingPrContent.mockImplementationOnce((_) => {
+        return {
+          body: 'prHeader PackageFiles',
+          comments: [
+            {
+              topic: 'PR List',
+              content: 'PR List',
+            },
+          ],
+          topicsToDelete: ['Package Files'],
+        };
+      });
+
+      await ensureOnboardingPr(
+        {
+          ...config,
+          prHeader: 'prHeader',
+        },
+        packageFiles,
+        branches,
+      );
+      expect(platform.ensureComment).toHaveBeenCalledTimes(1);
+      expect(platform.ensureCommentRemoval).toHaveBeenCalledTimes(1);
     });
 
     it('dryrun of creates PR', async () => {

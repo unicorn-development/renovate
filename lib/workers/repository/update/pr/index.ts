@@ -373,11 +373,11 @@ export async function ensurePr(
       let topics: string[] = [];
 
       if (prBody.comments) {
-        topics = prBody.comments.map((x) => x.title);
+        topics = prBody.comments.map((x) => x.topic);
         for (const comment of prBody.comments) {
           await platform.ensureComment({
             number: existingPr.number,
-            topic: comment.title,
+            topic: comment.topic,
             content: comment.content,
           });
         }
@@ -522,7 +522,7 @@ export async function ensurePr(
           for (const comment of prBody.comments) {
             await platform.ensureComment({
               number: pr.number,
-              topic: comment.title,
+              topic: comment.topic,
               content: comment.content,
             });
           }

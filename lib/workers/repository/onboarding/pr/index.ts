@@ -3,11 +3,12 @@ import { GlobalConfig } from '../../../../config/global';
 import type { RenovateConfig } from '../../../../config/types';
 import { logger } from '../../../../logger';
 import type { PackageFile } from '../../../../modules/manager/types';
+import type { PrContent } from '../../../../modules/platform';
 import { platform } from '../../../../modules/platform';
 import { ensureComment } from '../../../../modules/platform/comment';
 import { hashBody } from '../../../../modules/platform/pr-body';
+import { getOnboardingPrContent } from '../../../../modules/platform/pr-content';
 import { scm } from '../../../../modules/platform/scm';
-import { smartTruncate } from '../../../../modules/platform/utils/pr-body';
 import { emojify } from '../../../../util/emoji';
 import { getFile } from '../../../../util/git';
 import { toSha256 } from '../../../../util/hash';
@@ -30,28 +31,6 @@ import {
 import { getBaseBranchDesc } from './base-branch';
 import { getConfigDesc } from './config-description';
 import { getExpectedPrList } from './pr-list';
-
-interface PrContent {
-  packageFiles: string;
-  config: string;
-  warnings: string;
-  errors: string;
-  baseBranch: string;
-  prList: string;
-  prHeader: string;
-  prFooter: string;
-  onboardingConfigHashComment: string;
-}
-
-interface PrBodyContent {
-  body: string;
-  comments: PrComment[];
-}
-
-interface PrComment {
-  title: 'PR List' | 'Package Files';
-  content: string;
-}
 
 export async function ensureOnboardingPr(
   config: RenovateConfig,
@@ -138,22 +117,18 @@ If you need any further assistance then you can also [request help here](${
 
   if (existingPr) {
     logger.debug('Found open onboarding PR');
-    let topics: string[] = [];
 
     if (prBody.comments) {
-      topics = prBody.comments.map((x) => x.title);
       for (const comment of prBody.comments) {
         await platform.ensureComment({
           number: existingPr.number,
-          topic: comment.title,
+          topic: comment.topic,
           content: comment.content,
         });
       }
     }
-    const topicsToDelete = ['PR List', 'Package Files'].filter(
-      (x) => !topics.includes(x),
-    );
-    for (const topic of topicsToDelete) {
+
+    for (const topic of prBody.topicsToDelete) {
       await platform.ensureCommentRemoval({
         number: existingPr.number,
         type: 'by-topic',
@@ -206,7 +181,7 @@ If you need any further assistance then you can also [request help here](${
         for (const comment of prBody.comments) {
           await platform.ensureComment({
             number: pr.number,
-            topic: comment.title,
+            topic: comment.topic,
             content: comment.content,
           });
         }
@@ -240,7 +215,7 @@ function getPrBody(
   config: RenovateConfig,
   branches: BranchConfig[],
   onboardingConfigHashComment: string,
-): PrBodyContent {
+): PrContent {
   let packageFilesContent = '';
   if (packageFiles && Object.entries(packageFiles).length) {
     let files: string[] = [];
@@ -283,68 +258,7 @@ function getPrBody(
     onboardingConfigHashComment,
   };
 
-  const result: PrBodyContent = {
-    body: createPrBody(prTemplate, content, config),
-    comments: [],
-  };
-  if (result.body.length <= platform.maxBodyLength()) {
-    return result;
-  }
-
-  if (content.prList) {
-    result.comments.push({
-      title: 'PR List',
-      content: content.prList,
-    });
-    content.prList = 'Please see comment below for what to expect';
-
-    result.body = createPrBody(prTemplate, content, config);
-    if (result.body.length <= platform.maxBodyLength()) {
-      return result;
-    }
-  }
-
-  if (content.packageFiles) {
-    result.comments.push({
-      title: 'Package Files',
-      content: content.packageFiles,
-    });
-    content.packageFiles =
-      'Please see comment below for detected Package Files\n';
-
-    result.body = createPrBody(prTemplate, content, config);
-    if (result.body.length <= platform.maxBodyLength()) {
-      return result;
-    }
-  }
-
-  result.body = smartTruncate(result.body, platform.maxBodyLength());
-  return result;
-}
-
-function createPrBody(
-  bodyTemplate: string,
-  content: PrContent,
-  config: RenovateConfig,
-): string {
-  let prBody = bodyTemplate.replace(
-    '{{PACKAGE FILES}}\n',
-    content.packageFiles,
-  );
-  prBody = prBody.replace('{{CONFIG}}\n', content.config);
-  prBody = prBody.replace('{{WARNINGS}}\n', content.warnings);
-  prBody = prBody.replace('{{ERRORS}}\n', content.errors);
-  prBody = prBody.replace('{{BASEBRANCH}}\n', content.baseBranch);
-  prBody = prBody.replace('{{PRLIST}}\n', content.prList);
-  if (content.prHeader) {
-    prBody = `${template.compile(content.prHeader, config)}\n\n${prBody}`;
-  }
-  if (content.prFooter) {
-    prBody = `${prBody}\n---\n\n${template.compile(content.prFooter, config)}\n`;
-  }
-  prBody += content.onboardingConfigHashComment;
-  prBody = platform.massageMarkdown(prBody);
-  return prBody;
+  return getOnboardingPrContent(content, prTemplate, config);
 }
 
 function getRebaseCheckbox(onboardingRebaseCheckbox?: boolean): string {

@@ -298,3 +298,16 @@ export interface PlatformScm {
   mergeToLocal(branchName: string): Promise<void>;
   mergeAndPush(branchName: string): Promise<void>;
 }
+
+type CommentTopic = 'Release Notes' | 'Updates' | 'PR List' | 'Package Files';
+
+export interface PrContent {
+  body: string;
+  comments: PrComment[];
+  topicsToDelete: CommentTopic[];
+}
+
+export interface PrComment {
+  topic: CommentTopic;
+  content: string;
+}
