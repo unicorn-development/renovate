@@ -1,0 +1,30 @@
+schedules:
+  - cron: '0 1 * * *'
+    displayName: 'Every Day at 2am'
+    branches:
+      include: [main, azure-pipelines]
+
+trigger:
+  - main
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  - group: 'renovate'
+
+steps:
+  - task: NodeTool@0
+    inputs:
+      versionSource: 'spec'
+      versionSpec: '20.x'
+  - script: npm install -g corepack
+    displayName: 'update corepack'
+  - script: corepack enable
+    displayName: 'enable corepack'
+  - script: pnpm install
+    displayName: 'pnpm install'
+  - script: pnpm build
+    displayName: 'pnpm build'
+  - script: pnpm test
+    displayName: 'pnpm test'
