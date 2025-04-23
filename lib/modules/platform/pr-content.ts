@@ -1,10 +1,10 @@
+import type { RenovateConfig } from '../../config/types';
 import { regEx } from '../../util/regex';
 import { toBase64 } from '../../util/string';
 import * as template from '../../util/template';
 import { smartTruncate } from './utils/pr-body';
 import { platform } from '.';
 import type { PrContent, PrDebugData } from '.';
-import type { RenovateConfig } from '~test/util';
 
 interface ContentConfig {
   rebasingNotice?: string;
