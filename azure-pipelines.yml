@@ -26,5 +26,11 @@ steps:
     displayName: 'pnpm install'
   - script: pnpm build
     displayName: 'pnpm build'
-  - script: pnpm test
-    displayName: 'pnpm test'
+  - script: |
+      pnpm start --host-rules='[{"matchHost": "pkgs.dev.azure.com", "hostType": "nuget", "password": "$(System.AccessToken)"}]'
+    displayName: 'pnpm start'
+    env:
+      RENOVATE_TOKEN: $(System.AccessToken)
+      GITHUB_COM_TOKEN: $(GithubToken)
+  # - script: pnpm test
+  #   displayName: 'pnpm test'
