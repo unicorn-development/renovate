@@ -9,7 +9,18 @@ module.exports = {
     ":prHourlyLimitNone",
     ":prConcurrentLimitNone",
   ],
-  repositories: ["Development/WorkSimple.Houston", "Development/hshl.IDM", "Development/hshl.myHSHL", "Development/hshl.select", "Development/hshl.sign", "Development/bfw.IDM", "Development/bfw.Portal", "Development/Stromodul", "Development/stg.Wohlbefindlichkeit"],
+  repositories: [
+    "Development/WorkSimple.Houston",
+    "Development/hshl.IDM",
+    "Development/hshl.myHSHL",
+    "Development/hshl.select",
+    "Development/hshl.sign",
+    "Development/bfw.IDM",
+    "Development/bfw.Portal",
+    "Development/Stromodul",
+    "Development/stg.Wohlbefindlichkeit",
+    "Development/Connext.VivendiSDK"
+  ],
   packageRules: [
     {
       matchSourceUrls: [
