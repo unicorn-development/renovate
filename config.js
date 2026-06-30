@@ -19,7 +19,10 @@ module.exports = {
     "Development/bfw.Portal",
     "Development/Stromodul",
     "Development/stg.Wohlbefindlichkeit",
-    "Development/Connext.VivendiSDK"
+    "Development/Connext.VivendiSDK",
+    "Development/nuget.Exchange",
+    "Development/nuget.ActiveDirectory",
+    "Development/unicornde.Alma"
   ],
   packageRules: [
     {
