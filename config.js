@@ -22,7 +22,9 @@ module.exports = {
     "Development/Connext.VivendiSDK",
     "Development/nuget.Exchange",
     "Development/nuget.ActiveDirectory",
-    "Development/unicornde.Alma"
+    "Development/unicornde.Alma",
+    "Development/nuget.Efecte",
+    "Development/unicornde.BookStack"
   ],
   packageRules: [
     {
